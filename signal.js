@@ -1,5 +1,3 @@
-
-
 // JavaScript source code
 
 function main(s = [
@@ -97,42 +95,42 @@ function main(s = [
 
     const getTop = (point) => {
         let [i,j] = point; 
-        return s[i+1][j]; 
+        return [i+1, j, s[i+1][j]]; 
     }
 
     const getBottom = (point) => {
         let [i,j] = point;
-        return s[i-1][j]
+        return [i-1, j, s[i-1][j]]
     }
 
     const getLeft = (point) => {
         let [i,j] = point;
-        return s[i][j-1];
+        return [i, j-1, s[i][j-1]];
     }
 
     const getRight = (point) => {
         let [i,j] = point;
-        return s[i][j+1];
+        return [i, j+1, s[i][j+1]];
     }
 
     const getTopLeft = (point) => {
         let [i,j] = point;
-        return s[i+1][j-1];
+        return [i+1, j-1, s[i+1][j-1]];
     }
 
     const getBottomLeft = (point) => {
         let [i,j] = point;
-        return s[i-1][j-1];
+        return [i-1, j-1, s[i-1][j-1]];
     }
 
     const getTopRight = (point) => {
         let [i,j] = point;
-        return s[i+1][j+1];
+        return [i+1, j+1, s[i+1][j+1]];
     }
    
     const getBottomRight = (point) => {
         let [i,j] = point;
-        return s[i-1][j+1];
+        return [i-1, j+1, s[i-1][j+1]];
     }
     
     const getStateSpace = (point) => {
@@ -143,7 +141,7 @@ function main(s = [
              hasRight(point) ? getRight(point) : undefined,
              hasTopLeft(point) ? getTopLeft(point) : undefined,
              hasBottomLeft(point) ? getBottomLeft(point) : undefined,
-             hasTopRight(point) ? getBottomRight(point) : undefined,
+             hasTopRight(point) ? getTopRight(point) : undefined,
              hasBottomRight(point) ? getBottomRight(point) : undefined 
         ]
     };
@@ -152,6 +150,7 @@ function main(s = [
     
     let disjoint = new Set([]);
     let explored = new Set([]);
+    let frontier = new Set([]);
     
     for (let i = 0; i < size; i++) {
         for (let j = 0; j < size; j++) {
@@ -162,33 +161,103 @@ function main(s = [
     }
     
     let centerOfMass = [];
-	
-	//need to save high and low, of x,y, use DFS, construct and return list 
     for(let point of disjoint){
+        if(!explored.has(point.join())){
+          
+            console.log(explored);
 
-        if(!explored.has(point)){
-            explored.add(point);
-
-            let expand = false;
             let neighbors = getStateSpace(point);
-            
-            for(let signal of neighbors){    
-                if(typeof(signal) !== "undefined"){
-                    if(signal >= 200){
-                        expand = true;
-                        //explore by expanding MB
+            console.log("Neighbors: " + neighbors);
 
-                        //add to explored 
-                        //explored.add(section);
+            let minX = Infinity,
+                maxX = -Infinity,
+                minY = Infinity,
+                maxY = -Infinity;
+    
+            let clusterSize = 0;
+
+            while(neighbors !== undefined && neighbors.length > 0){
+                let signal = neighbors.pop();
+                console.log("signal: " + signal);
+                console.log("neighbors: " + neighbors)
+                console.log("neighbors length :" + neighbors.length)
+
+                if(signal !== undefined){
+                    let [i,j,val] = signal;
+                    if(!explored.has([i,j].join())){
+                    
+                        explored.add([i,j].join());
+                        clusterSize+=1;
+
+                        if (i < minX){ minX = i; }
+                        if (i > maxX){ maxX = i; }
+                        if (j < minY){ minY = j; }
+                        if (j > maxY){ maxY = j; }
+                    
+                        let newItems = getStateSpace([i,j]); //add to neighbors and continue
+                        while(newItems.length > 0){
+                            let top = newItems.pop();
+                            if(top !== undefined){
+                                let [a,b,c] = top;
+                                if (!explored.has([a,b].join())){
+                                    neighbors.push(top);
+                                } 
+                            }
+                        }
+
                     }
                 }
+                
             }
-            //if(!hasMB){
-            //    centerOfMass.push(point);
-            //}
+
+            console.log(clusterSize);
+
+            console.log("minx " + minX);
+            console.log("maxX " + maxX);
+            console.log("minY " + minY);
+            console.log("maxY " + maxY);
+
+            let x_center = 0;
+            if(maxX != minX){
+                x_center = (maxX + minX)/2;
+            }
+            else{
+                x_center = maxX;
+            }
+
+            //let y_center = maxY != minY ? (maxY + minY)/2 : y_center = maxY;
+            let y_center = 0;
+            if(maxY != minY){
+                y_center = (maxY + minY)/2
+            }
+            else{
+                y_center = maxY;
+            }
+
+            let center = [x_center, y_center];
+            console.log(center);
+
+            if(clusterSize <= 2){
+                centerOfMass.push(point);
+            }
+            else{
+                centerOfMass.push(center);
+            }
+
+            console.log(centerOfMass);
+          
+            
+
+           // let center = [(maxX - minX)/2, (maxY - minY)/2];
+            //let center = [(Math.max(...x) - Math.min(...x))/2, (Math.max(...y) - Math.min(...y))/2];  //is there a better way
+            //centerOfMass.push(center);
+
+          
         }
+        
     }
-    return centerOfMass;
+    //console.log(centerOfMass);
+    
 }
 
 main();
