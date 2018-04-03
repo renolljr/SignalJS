@@ -135,7 +135,7 @@ function main(s = [
         return s[i-1][j+1];
     }
     
-    const getMarkovBlanket = (point) => {
+    const getStateSpace = (point) => {
         return [   
              hasTop(point) ? getTop(point) : undefined,
              hasBottom(point) ? getBottom(point) : undefined,
@@ -160,18 +160,35 @@ function main(s = [
             }
         }
     }
-
+    
+    let centerOfMass = [];
+	
+	//need to save high and low, of x,y, use DFS, construct and return list 
     for(let point of disjoint){
-       
-        let mb = getMarkovBlanket(point);
-        console.log(mb);
-        for(let section of mb){
-            if(typeof(section) !== "undefined"){
-                console.log(section);
-            }
 
+        if(!explored.has(point)){
+            explored.add(point);
+
+            let expand = false;
+            let neighbors = getStateSpace(point);
+            
+            for(let signal of neighbors){    
+                if(typeof(signal) !== "undefined"){
+                    if(signal >= 200){
+                        expand = true;
+                        //explore by expanding MB
+
+                        //add to explored 
+                        //explored.add(section);
+                    }
+                }
+            }
+            //if(!hasMB){
+            //    centerOfMass.push(point);
+            //}
         }
     }
+    return centerOfMass;
 }
 
 main();
