@@ -1,3 +1,5 @@
+
+
 // JavaScript source code
 
 function main(s = [
@@ -150,7 +152,6 @@ function main(s = [
     
     let disjoint = new Set([]);
     let explored = new Set([]);
-    let frontier = new Set([]);
     
     for (let i = 0; i < size; i++) {
         for (let j = 0; j < size; j++) {
@@ -163,12 +164,7 @@ function main(s = [
     let centerOfMass = [];
     for(let point of disjoint){
         if(!explored.has(point.join())){
-          
-            console.log(explored);
-
             let neighbors = getStateSpace(point);
-            console.log("Neighbors: " + neighbors);
-
             let minX = Infinity,
                 maxX = -Infinity,
                 minY = Infinity,
@@ -178,10 +174,6 @@ function main(s = [
 
             while(neighbors !== undefined && neighbors.length > 0){
                 let signal = neighbors.pop();
-                console.log("signal: " + signal);
-                console.log("neighbors: " + neighbors)
-                console.log("neighbors length :" + neighbors.length)
-
                 if(signal !== undefined){
                     let [i,j,val] = signal;
                     if(!explored.has([i,j].join())){
@@ -210,13 +202,6 @@ function main(s = [
                 
             }
 
-            console.log(clusterSize);
-
-            console.log("minx " + minX);
-            console.log("maxX " + maxX);
-            console.log("minY " + minY);
-            console.log("maxY " + maxY);
-
             let x_center = 0;
             if(maxX != minX){
                 x_center = (maxX + minX)/2;
@@ -235,28 +220,18 @@ function main(s = [
             }
 
             let center = [x_center, y_center];
-            console.log(center);
-
             if(clusterSize <= 2){
                 centerOfMass.push(point);
             }
             else{
                 centerOfMass.push(center);
             }
-
-            console.log(centerOfMass);
-          
-            
-
-           // let center = [(maxX - minX)/2, (maxY - minY)/2];
-            //let center = [(Math.max(...x) - Math.min(...x))/2, (Math.max(...y) - Math.min(...y))/2];  //is there a better way
-            //centerOfMass.push(center);
-
           
         }
         
     }
-    //console.log(centerOfMass);
+    console.log(centerOfMass);
+    return centerOfMass;
     
 }
 
